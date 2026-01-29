@@ -1,25 +1,24 @@
 // importar el modulo http de Node.js
 const http = require('http');
 
+const fs = require('fs').promises;
+
 // definir el puerto y la direccion del servidor
 const PORT = 3000;
 
 // crear el servidor
 const servidor = http.createServer((req, res) => {
-    // manejo de diferentes rutas
-    if (req.url === '/') {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('pagina principal\n');
-    }
-    else if (req.url === '/about') {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('acerca de nosotros\n');
-    }
-    else {
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.end('pagina no encontrada\n');
-    }
-    
+ // lectura asincrona: no bloquea el evento loop
+    fs.readFile('./index.html', (err, data) => {
+        if (err) {
+            res.statusCode = 500;
+            res.end('Error al leer el archivo.');
+            return;
+        } 
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'text/html');
+        res.end(data);
+    });
 });
 
 // iniciar el servidor y escuchar en el puerto definido
